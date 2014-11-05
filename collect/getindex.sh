@@ -8,8 +8,8 @@
 # Edgar ftp URL for the full index
 URL=ftp://ftp.sec.gov/edgar/full-index
 
-years='1994 1998 2002 2006 2010 2014'
-qtrs='1'
+years='1994 1995 1996 1997 1998 1999 2000 2001 2002 2003 2004 2005 2006 2007 2008 2009 2010 2011 2012 2013 2014'
+qtrs='1 2 3 4'
 
 for year in `echo $years`
 do
@@ -19,3 +19,6 @@ do
     done
 done
 
+# Download the current idx
+rm ../idx/2014-4-form.idx
+curl $URL/2014/QTR4/form.idx | grep ^10-K\ >| ../idx/2014-4-form.idx
