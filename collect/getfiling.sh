@@ -8,17 +8,15 @@
 # Edgar ftp URL for the full index
 URL=ftp://ftp.sec.gov/
 
-echo $1
-filename=`basename $1`
-dirname=`echo $1 |awk -F "/" '{print $3}'`
-extract=`basename $1 | sed 's/\.txt/_md.txt/'`
-# echo Downloading $filename $extract $dirname
+for filing in `cat $1`
+do
 
-[ -d "../data/$dirname" ] || mkdir ../data/$dirname
-
-[ ! -e ../data/$dirname/$filename ] && curl $URL/$1 > ../data/$dirname/$filename
-
-
-
-
-
+	echo Downloading $filing
+	filename=`basename $filing`
+	dirname=`echo $filing |awk -F "/" '{print $3}'`
+	# echo Downloading $filename $extract $dirname
+	[ -d data/$dirname ] || mkdir data/$dirname
+	[ ! -e data/$dirname/$filename ] && curl -s -S $URL/$filing > data/$dirname/$filename || echo $filing >>$1.failed 
+	aws s3 cp data/$dirname/$filename s3://midsedgar/data/$dirname/$filename
+	rm data/$dirname/$filename
+done
