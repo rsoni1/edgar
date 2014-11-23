@@ -40,5 +40,6 @@ done
 # Extract the MD&A
 for filing in `awk '{print $NF}' filings.idx`
 do
-    ./extractmda.sh $filing
+    #./extractmda.sh $filing
+    perl extract.pl $filing
 done
