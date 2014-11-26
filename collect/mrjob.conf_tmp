@@ -1,0 +1,10 @@
+# Copy to mrjob.conf and add AWS Keys
+runners:
+  emr:
+    aws_access_key_id: <access key>
+    aws_secret_access_key: <Secret key>
+    aws_region: <Region>
+    ec2_key_pair: <KeyPair>
+    ec2_key_pair_file: <Path to key file>
+    ssh_tunnel_is_open: true
+    ssh_tunnel_to_job_tracker: true
