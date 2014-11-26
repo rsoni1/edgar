@@ -5,8 +5,8 @@ import boto
 import random
 import os, sys, commands, shutil
 
-AWS_ACCESS = "AKIAI2Y7XWTMM7BPIY5Q"
-AWS_SECRET = "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"
+AWS_ACCESS = ""
+AWS_SECRET = ""
 BUCKET = "midsedgar"
 MDA_THRESHOLD = 1000
 PERL_CODE_KEY = "extract.pl"
@@ -15,7 +15,7 @@ class MRExtractMDA(MRJob):
     bucket = None
 
     def mapper_init(self):
-        print("Initializing connection...")
+        sys.stderr.write("Initializing connection...\n")
         # Get S3 connection
         conn = boto.connect_s3(AWS_ACCESS, AWS_SECRET)
         self.bucket = conn.get_bucket(BUCKET)
@@ -42,7 +42,7 @@ class MRExtractMDA(MRJob):
         mda_file = tmp_fname+'_mda'
         if "mda outputted" in respond:
             # Check if the filesize is above threshold
-            print("Processing "+tmp_fname)
+            sys.stderr.write("Processing "+tmp_fname+"\n")
             statinfo = os.stat(mda_file)
             size = statinfo.st_size
             if (size > MDA_THRESHOLD):
