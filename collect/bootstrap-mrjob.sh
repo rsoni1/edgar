@@ -6,3 +6,5 @@ sudo python -m nltk.downloader -d /usr/share/nltk_data all
 yes | sudo yum install perl-CPAN
 yes | sed 's/y//' | sudo cpan install HTML::Parser
 sudo cpan install HTML::Parser
+sudo easy_install pysentiment
+

@@ -27,7 +27,17 @@ class MRExtractMDA(MRJob):
         
     def mapper(self, _, line):
         # extract key from input line
+	# sys.stderr.write("DEBUG : Mapper input line = "+line+"\n")
+
+	# Uncomment for NLineInputFormat
+	# tok=line.split()
+	# tok1=tok[1]
+
+	# Switch for NLineInputFormat
+        # key_name = tok1[6:]
         key_name = line[6:]
+	
+	# sys.stderr.write("DEBUG : KeyName  = "+key_name+"\n")
         key = self.bucket.get_key(key_name)
         # Create a tmp filename with prefix /tmp/edgar
         str='%030x' % random.randrange(16**30)
@@ -68,5 +78,6 @@ class MRExtractMDA(MRJob):
         yield key, sum(values)
 
 if __name__ == '__main__':
+   # MRExtractMDA.HADOOP_INPUT_FORMAT = 'org.apache.hadoop.mapred.lib.NLineInputFormat'
    MRExtractMDA.run()
 
