@@ -1,0 +1,80 @@
+#alex risman, MIDS 205 edgar project
+
+import sqlite3
+#need to run "sudo pip install ystockquote" before you can import this library
+import urllib
+import urllib2
+
+def main():
+    quotes_file = "quotes.txt"
+    quotes_file = open(quotes_file, 'r')
+    conn = cnnct_db("edgarNov232014.db")
+    cur = conn.cursor()
+    cur = create_table(cur, "quotes", " (ticker text, CIK int, date text, open_price real, close_price real)")
+    cur = clear_table(cur, "quotes")
+    for quote in quotes:
+        quote_arr = quote.split('\t')
+        curr_ticker = quote_arr[0]
+        curr_cik = quote_arr[1]
+        curr_date = quote_arr[2]
+        curr_open = quote_arr[3]
+        curr_close = quote_arr[4]
+        data = [curr_ticker, curr_cik, curr_date, curr_open, curr_close]
+        cur = insert_data(cur, "quotes", data)
+        if not '-' in curr_date:
+            curr_date = curr_date[0:4] + '-' + curr_date[4:6] + '-' + curr_date[6:8]
+        date_arr = curr_date.split("-")
+        curr_year = date_arr[0]
+        curr_mnth = date_arr[1]
+        curr_day = date_arr[2]
+        curr_date_obj = date(curr_year, curr_mnth, curr_day)
+        price_json = ystockquote.get_historical_prices(curr_ticker, curr_date, curr_date)
+        if curr_date in price_json and 'Close' in price_json[curr_date] and 'Open' in price_json[curr_date]:
+            curr_close = price_json[curr_date]['Close']
+            curr_open = price_json[curr_date]['Open']
+            data = [curr_ticker, curr_cik, curr_date, curr_open, curr_close]
+            print data
+            cur = insert_data(cur, "quotes", data)
+
+
+    conn.commit()
+    conn.close()
+    quotes_file.close
+
+
+
+
+def cnnct_db(db_name):
+    conn = sqlite3.connect(db_name)
+    return conn
+
+def create_table(cur, tname, col_string):
+    query = 'create table if not exists ' + tname + col_string
+    cur.execute(query)
+    return cur
+
+def clear_table(cur, tname):
+	query = 'delete from ' + tname
+	cur.execute
+	return cur
+
+def insert_data(cur, tname, data):
+    query = 'insert into ' + tname + ' values ("' + str(data[0]).strip() + '", "' + str(data[1]).strip() + '", "' + str(data[2]).strip() + '", "' + str(data[3]).strip() + '", "' + str(data[4]).strip() + '")'
+    cur.execute(query)
+    return cur
+
+def get_tickers(cur):
+    query = """
+    select distinct a.ticker, a.cik, c.filingDate
+    from edgar_ticker as a
+    join (select ticker from
+            (select ticker, count(ticker) as tck_cnt from edgar_ticker group by ticker)
+            where tck_cnt = 1) as b on a.ticker = b.ticker
+    join edgar_10K as c on a.cik = c.cik
+    where cast(a.cik_cnt as int) < 22"""
+    cur.execute(query)
+    return cur.fetchall()
+
+if __name__ == '__main__':
+    main()
+

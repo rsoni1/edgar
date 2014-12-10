@@ -1,0 +1,1 @@
+ticker	cik	date	open_price	close_price	polarity	positive	negative	subjectivity

@@ -1,0 +1,4 @@
+sqlite3 edgar_sentiment.db
+create table quotes_two (tickers, cik, filing_date, open, close, adj_close, yest_open, yest_close, yest_adj_close, curr_mkt_cap)
+.separator \t
+.import quotes_job/quotes_output.txt quotes_two

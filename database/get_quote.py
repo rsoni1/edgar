@@ -7,6 +7,8 @@ import urllib
 import urllib2
 import json  
 import os
+import sys
+from datetime import date
 
 def main():
     error_file = "no_quote.txt"
@@ -27,6 +29,11 @@ def main():
             curr_date = ticker[2]
             if not '-' in curr_date:
                 curr_date = curr_date[0:4] + '-' + curr_date[4:6] + '-' + curr_date[6:8]
+            # date_arr = curr_date.split("-")
+            # curr_year = date_arr[0]
+            # curr_mnth = date_arr[1]
+            # curr_day = date_arr[2]
+            # curr_date_obj = date(curr_year, curr_mnth, curr_day)
             price_json = ystockquote.get_historical_prices(curr_ticker, curr_date, curr_date)
             if curr_date in price_json and 'Close' in price_json[curr_date] and 'Open' in price_json[curr_date]:
                 curr_close = price_json[curr_date]['Close']
@@ -34,11 +41,12 @@ def main():
                 data = [curr_ticker, curr_cik, curr_date, curr_open, curr_close]
                 print data
                 cur = insert_data(cur, "quotes", data)
+                conn.commit()
 
         except:
             error_file.write(curr_ticker + ', ' + curr_cik + ', ' + curr_date) 
 
-    conn.commit()
+    
     conn.close()
     error_file.close
 
@@ -72,7 +80,8 @@ def get_tickers(cur):
             (select ticker, count(ticker) as tck_cnt from edgar_ticker group by ticker)
             where tck_cnt = 1) as b on a.ticker = b.ticker
     join edgar_10K as c on a.cik = c.cik
-    where cast(a.cik_cnt as int) < 22"""
+    where cast(a.cik_cnt as int) < 22
+    and not (a.ticker in (select ticker from quotes) and c.filingDate in (select date from quotes))"""
     cur.execute(query)
     return cur.fetchall()
 
